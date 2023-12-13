@@ -13,16 +13,12 @@
                     <option value="<?php echo $visiteur['id'] ?>"> <?php echo $visiteur['visiteur'] ?></option>
                 <?php } ?>
             </select>
-
             <label for="date">Mois: </label>
-            <select name="visiteur" id="name">
-                <?php foreach ($visiteurs as $visiteur) { ?>
-                    <option value="<?php echo $visiteur['date'] ?>"> <?php echo $visiteur['date'] ?></option>
+            <select name="date" id="date">
+                <?php foreach ($dates as $date) { ?>
+                    <option value="<?php echo $date['date'] ?>"> <?php echo $date['date'] ?></option>
                 <?php } ?>
             </select>
-
-
-
             <input type="submit" value="Envoyer">
         </div>
     </form>

@@ -463,7 +463,7 @@ class PdoGsb {
     public function getTousLesVisteurCloture(): array {
         $listeVisiteurs = array();
         $requetePrepare = $this->connexion->prepare(
-                "SELECT nom,prenom, mois,id "
+                "SELECT DISTINCT nom,prenom,id "
                 . "FROM fichefrais "
                 . "INNER JOIN visiteur "
                 . "ON visiteur.id=fichefrais.idvisiteur "
@@ -472,9 +472,7 @@ class PdoGsb {
         $requetePrepare->execute();
         while ($ligne = $requetePrepare->fetch(PDO::FETCH_ASSOC)) {
             $nomcplt = $ligne['nom'] . " " . $ligne['prenom'];
-            $datecplt = substr($ligne['mois'], 4, 2) . "/" . substr($ligne['mois'], 0, 4);
             $listeVisiteurs[] = array(
-                'date' => $datecplt,
                 'visiteur' => $nomcplt,
                 'id' => $ligne['id']
             );
@@ -482,10 +480,28 @@ class PdoGsb {
 
         return $listeVisiteurs;
     }
+
+    public function getTousLesMois(): array {
+        $dates = array();
+        $requetePrepare = $this->connexion->prepare(
+                "SELECT DISTINCT mois "
+                . "FROM fichefrais "
+        );
+        $requetePrepare->execute();
+        while ($ligne = $requetePrepare->fetch(PDO::FETCH_ASSOC)) {
+            $datecplt = substr($ligne['mois'], 4, 2) . "/" . substr($ligne['mois'], 0, 4);
+            $dates[] = array(
+                'date' => $datecplt,
+            );
+        }
+
+        return $dates;
+    }
 }
 
 /**
- *         while ($laLigne = $requetePrepare->fetch()) {
+ * $datecplt = substr($ligne['mois'], 4, 2) . "/" . substr($ligne['mois'], 0, 4);
+ *          while ($laLigne = $requetePrepare->fetch()) {
             $mois = $laLigne['mois'];
             $numAnnee = substr($mois, 0, 4);
             $numMois = substr($mois, 4, 2);
