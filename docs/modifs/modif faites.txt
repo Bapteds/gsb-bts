@@ -1,0 +1,3 @@
+1-/ Modification de la base de donnée, ajout dans la table visiteur d'un champ "role", ayant une FK avec une nouvelle table role(id, role_name).
+    Je ne peux saisir que les role ayant été mis dans la table role. Actuellement = Comptable, Visiteur.
+2-/ Ajout d'une variable de session contenant le role du visiteur, pour afficher les vues 

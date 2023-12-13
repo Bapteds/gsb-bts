@@ -16,7 +16,8 @@ body {
   background-color: #f5f5f5;
 }
 body > .container {
-  padding: 60px 15px 25px;
+    /*Tout orange ICI*/
+   padding: 60px 15px 25px;
 }
 .container .text-muted {
   margin: 20px 0;
@@ -32,3 +33,4 @@ footer .container p {
 code {
   font-size: 80%;
 }
+
