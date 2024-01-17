@@ -295,47 +295,6 @@ class PdoGsb {
     }
 
     /**
-     * Crée une nouvelle fiche de frais et les lignes de frais au forfait
-     * pour un visiteur et un mois donnés
-     *
-     * Récupère le dernier mois en cours de traitement, met à 'CL' son champs
-     * idEtat, crée une nouvelle fiche de frais avec un idEtat à 'CR' et crée
-     * les lignes de frais forfait de quantités nulles
-     *
-     * @param String $idVisiteur ID du visiteur
-     * @param String $mois       Mois sous la forme aaaamm
-     *
-     * @return null
-     */
-    public function creeNouvellesLignesFrais($idVisiteur, $mois): void {
-        $dernierMois = $this->dernierMoisSaisi($idVisiteur);
-        $laDerniereFiche = $this->getLesInfosFicheFrais($idVisiteur, $dernierMois);
-        if ($laDerniereFiche['idEtat'] == 'CR') {
-            $this->majEtatFicheFrais($idVisiteur, $dernierMois, 'CL');
-        }
-        $requetePrepare = $this->connexion->prepare(
-                'INSERT INTO fichefrais (idvisiteur,mois,nbjustificatifs,'
-                . 'montantvalide,datemodif,idetat) '
-                . "VALUES (:unIdVisiteur,:unMois,0,0,now(),'CR')"
-        );
-        $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
-        $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
-        $requetePrepare->execute();
-        $lesIdFrais = $this->getLesIdFrais();
-        foreach ($lesIdFrais as $unIdFrais) {
-            $requetePrepare = $this->connexion->prepare(
-                    'INSERT INTO lignefraisforfait (idvisiteur,mois,'
-                    . 'idfraisforfait,quantite) '
-                    . 'VALUES(:unIdVisiteur, :unMois, :idFrais, 0)'
-            );
-            $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
-            $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
-            $requetePrepare->bindParam(':idFrais', $unIdFrais['idfrais'], PDO::PARAM_STR);
-            $requetePrepare->execute();
-        }
-    }
-
-    /**
      * Crée un nouveau frais hors forfait pour un visiteur un mois donné
      * à partir des informations fournies en paramètre
      *
@@ -467,7 +426,7 @@ class PdoGsb {
                 . "FROM fichefrais "
                 . "INNER JOIN visiteur "
                 . "ON visiteur.id=fichefrais.idvisiteur "
-                . "WHERE idetat= 'CL'"
+                . "WHERE idetat= 'CL' AND nom_role != 'Comptable'"
         );
         $requetePrepare->execute();
         while ($ligne = $requetePrepare->fetch(PDO::FETCH_ASSOC)) {
@@ -481,22 +440,68 @@ class PdoGsb {
         return $listeVisiteurs;
     }
 
+    
+    
     public function getTousLesMois(): array {
         $dates = array();
         $requetePrepare = $this->connexion->prepare(
                 "SELECT DISTINCT mois "
-                . "FROM fichefrais "
+                . "FROM fichefrais WHERE idetat='CL'"
         );
         $requetePrepare->execute();
         while ($ligne = $requetePrepare->fetch(PDO::FETCH_ASSOC)) {
+            //Ici comme je modifi déja les dates une fois pour le front, je stocke la valeur de base dans un autre tableau pour mon traitement 
+            // A CHANGER -> PAS FOU 
             $datecplt = substr($ligne['mois'], 4, 2) . "/" . substr($ligne['mois'], 0, 4);
             $dates[] = array(
-                'date' => $datecplt,
+                'date_front' => $datecplt,
+                'date_back' => $ligne['mois'],
             );
         }
-
         return $dates;
     }
+
+    /**
+     * Crée une nouvelle fiche de frais et les lignes de frais au forfait
+     * pour un visiteur et un mois donnés
+     *
+     * Récupère le dernier mois en cours de traitement, met à 'CL' son champs
+     * idEtat, crée une nouvelle fiche de frais avec un idEtat à 'CR' et crée
+     * les lignes de frais forfait de quantités nulles
+     *
+     * @param String $idVisiteur ID du visiteur
+     * @param String $mois       Mois sous la forme aaaamm
+     *
+     * @return null
+     */
+    public function creeNouvellesLignesFrais($idVisiteur, $mois): void {
+        $dernierMois = $this->dernierMoisSaisi($idVisiteur);
+        $laDerniereFiche = $this->getLesInfosFicheFrais($idVisiteur, $dernierMois);
+        if ($laDerniereFiche['idEtat'] == 'CR') {
+            $this->majEtatFicheFrais($idVisiteur, $dernierMois, 'CL');
+        }
+        $requetePrepare = $this->connexion->prepare(
+                'INSERT INTO fichefrais (idvisiteur,mois,nbjustificatifs,'
+                . 'montantvalide,datemodif,idetat) '
+                . "VALUES (:unIdVisiteur,:unMois,0,0,now(),'CR')"
+        );
+        $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
+        $requetePrepare->execute();
+        $lesIdFrais = $this->getLesIdFrais();
+        foreach ($lesIdFrais as $unIdFrais) {
+            $requetePrepare = $this->connexion->prepare(
+                    'INSERT INTO lignefraisforfait (idvisiteur,mois,'
+                    . 'idfraisforfait,quantite) '
+                    . 'VALUES(:unIdVisiteur, :unMois, :idFrais, 0)'
+            );
+            $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
+            $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
+            $requetePrepare->bindParam(':idFrais', $unIdFrais['idfrais'], PDO::PARAM_STR);
+            $requetePrepare->execute();
+        }
+    }
+    
 }
 
 /**

@@ -16,7 +16,7 @@
             <label for="date">Mois: </label>
             <select name="date" id="date">
                 <?php foreach ($dates as $date) { ?>
-                    <option value="<?php echo $date['date'] ?>"> <?php echo $date['date'] ?></option>
+                    <option value="<?php echo $date['date_back'] ?>"> <?php echo $date['date_front'] ?></option>
                 <?php } ?>
             </select>
             <input type="submit" value="Envoyer">

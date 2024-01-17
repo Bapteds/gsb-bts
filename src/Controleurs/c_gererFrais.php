@@ -24,7 +24,7 @@ $numMois = substr($mois, 4, 2);
 $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 switch ($action) {
     case 'saisirFrais':
-        if ($pdo->estPremierFraisMois($idVisiteur, $mois)) {
+        if ($pdo->estPremierFraisMois($idVisiteur, $mois) ) {
             $pdo->creeNouvellesLignesFrais($idVisiteur, $mois);
         }
         break;
