@@ -440,8 +440,6 @@ class PdoGsb {
         return $listeVisiteurs;
     }
 
-    
-    
     public function getTousLesMois(): array {
         $dates = array();
         $requetePrepare = $this->connexion->prepare(
@@ -501,7 +499,7 @@ class PdoGsb {
             $requetePrepare->execute();
         }
     }
-    
+
 }
 
 /**
