@@ -21,7 +21,7 @@
 <div class="row">
     <div class="panel panel-info">
         <div class="panel-heading">Descriptif des éléments hors forfait</div>
-        <table class="table table-bordered table-responsive">
+        <table class="table table-bordered text-center table-responsive">
             <thead>
                 <tr>
                     <th class="date">Date</th>
